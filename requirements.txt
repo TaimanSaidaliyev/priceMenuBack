@@ -1,0 +1,7 @@
+django
+djangorestframework
+Pillow
+django-mptt
+django-reset-migrations
+mysqlclient
+django-cors-headers
