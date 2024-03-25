@@ -28,4 +28,8 @@ urlpatterns = [
     path('auth/', include('djoser.urls.jwt')),
     path('auth/token/check/', TokenCheck.as_view()),
     path('auth/token/get_establishment/', GetEstablishmentByToken.as_view()),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
+
+if settings.DEBUG:
+  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
