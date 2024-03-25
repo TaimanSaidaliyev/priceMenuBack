@@ -136,7 +136,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://localhost:5173',
-    '660171b9cdde151415328894--glistening-gumdrop-5f7c14.netlify.app'
+    'https://660171b9cdde151415328894--glistening-gumdrop-5f7c14.netlify.app'
 ]
 
 STATIC_URL = '/static/'
