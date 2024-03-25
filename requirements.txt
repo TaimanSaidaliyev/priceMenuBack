@@ -5,3 +5,5 @@ django-mptt
 django-reset-migrations
 mysqlclient
 django-cors-headers
+djoser
+djangorestframework-simplejwt
