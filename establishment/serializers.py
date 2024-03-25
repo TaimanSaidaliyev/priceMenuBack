@@ -20,7 +20,7 @@ class ListOfProductsSerializer(serializers.ModelSerializer):
 class ProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products
-        fields = ['id', 'title', 'description', 'price', 'old_price', 'photo', 'is_active', 'is_published']
+        fields = ['id', 'title', 'description', 'price', 'old_price', 'photo', 'is_active', 'is_published', 'sorting_number']
 
 
 class MenuCategorySerializer(serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class MenuCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MenuCategory
-        fields = ['id', 'category_title', 'products']
+        fields = ['id', 'category_title', 'products', 'sorting_number']
 
 
 class MenuSerializer(serializers.ModelSerializer):
@@ -36,7 +36,7 @@ class MenuSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Menu
-        fields = ['id', 'menu_title', 'photo', 'categories', 'establishment']
+        fields = ['id', 'menu_title', 'photo', 'categories', 'establishment', 'sorting_number']
         depth = 10
 
 
@@ -85,3 +85,17 @@ class ProductAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products
         fields = ('__all__')
+
+
+class ProductWithCountSerializer(serializers.ModelSerializer):
+    count = serializers.IntegerField()
+
+    class Meta:
+        model = Products
+        fields = ['id', 'title', 'description', 'price', 'count', 'is_active', 'additional_code']
+
+
+class EstablishmentChangeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Establishment
+        fields = ['id', 'title', 'description', 'default_color', 'photo', 'backgroundImage', 'menu_view_type', 'workTime']

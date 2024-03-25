@@ -1,9 +1,9 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from establishment.views import *
-
+from userProfile.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -22,4 +22,10 @@ urlpatterns = [
     path('add_edit/products/', AddProductByCategory.as_view()),
     path('add_edit/products/sorting/', UpdateProductSorting.as_view()),
     path('add_edit/categories/sorting/', UpdateCategorySorting.as_view()),
+    path('product/get_list/', GetProductsByIds.as_view()),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
+    path('auth/', include('djoser.urls.jwt')),
+    path('auth/token/check/', TokenCheck.as_view()),
+    path('auth/token/get_establishment/', GetEstablishmentByToken.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

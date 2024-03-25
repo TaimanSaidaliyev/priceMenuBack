@@ -1,5 +1,6 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
+from datetime import date
 
 
 class Country(models.Model):
@@ -72,11 +73,11 @@ class Establishment(models.Model):
     title = models.CharField(max_length=99, verbose_name='Название заведения')
     default_color = models.CharField(max_length=7, verbose_name='Цвет заведения')
     secondary_color = models.BooleanField(default=True, verbose_name='Вторичный цвет (Белый)')
-    description = models.TextField(max_length=500, verbose_name='Описание заведения')
+    description = models.TextField(max_length=500, verbose_name='Описание заведения', blank=True, default='')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
     photo = models.ImageField(upload_to='photos/%Y/%m/%d', verbose_name='Изображение', blank=True)
-    backgroundImage = models.ImageField(upload_to='photos/%Y/%m/%d', verbose_name='Фоновое изображение', blank=True)
+    backgroundImage = models.ImageField(upload_to='photos/background/%Y/%m/%d', verbose_name='Фоновое изображение', blank=True)
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
     rating = models.FloatField(default=0, verbose_name='Рейтинг заведения')
     coordinate_w = models.FloatField(default=0, blank=False, null=False, verbose_name='Ширина')
@@ -84,10 +85,11 @@ class Establishment(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE, blank=True, verbose_name='Город', related_name='shop_city')
     address = models.CharField(max_length=2000, verbose_name='Адрес заведения')
     workTime = models.CharField(max_length=99, verbose_name='Режим работы заведения')
-    phoneNumber = models.CharField(max_length=99, verbose_name='Телефон')
+    phoneNumber = models.CharField(max_length=99, verbose_name='Телефон', blank=True, default='')
     premium_status = models.ForeignKey(PremiumStatus, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Премиум статус заведения', related_name='get_establishment_status')
     type_of_establishment = models.ForeignKey(TypeOfEstablishment, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Тип заведения', related_name='get_type_of_establishment')
     menu_view_type = models.CharField(max_length=10, choices=MENU_VIEW_CHOICES, default=LIST, verbose_name='Вид меню')
+    until_date = models.DateField(blank=True, verbose_name='Дата истечения срока', default=date(2024, 1, 1))
 
     def __str__(self):
         return self.title
@@ -139,7 +141,7 @@ class MenuCategory(models.Model):
 
 class Products (models.Model):
     title = models.CharField(max_length=99, verbose_name='Название блюда')
-    description = models.TextField(max_length=500, verbose_name='Описание блюда')
+    description = models.TextField(max_length=500, verbose_name='Описание блюда', blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
     price = models.FloatField(default=0, blank=False, null=False, verbose_name='Текущая цена')
@@ -151,6 +153,7 @@ class Products (models.Model):
     establishment = models.ForeignKey(Establishment, on_delete=models.PROTECT, blank=True, null=True,
                                       verbose_name='Заведение', related_name='get_products_establishment')
     sorting_number = models.IntegerField(default=0, blank=True, null=True, verbose_name='Порядок сортировки')
+    additional_code = models.CharField(max_length=99, verbose_name='Альтернативный код', blank=True, default='')
 
     def __str__(self):
         return self.title
@@ -170,7 +173,7 @@ class Promotions(models.Model):
     ]
 
     title = models.CharField(max_length=100, db_index=True, verbose_name='Название акции')
-    description = models.TextField(max_length=300, db_index=True, verbose_name='Описание акции')
+    description = models.TextField(max_length=300, db_index=True, verbose_name='Описание акции', blank=True, default='')
     photo = models.ImageField(upload_to='photos/%Y/%m/%d', verbose_name='Изображение', blank=True)
     until_date = models.DateField(verbose_name='Дата истечения срока')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
