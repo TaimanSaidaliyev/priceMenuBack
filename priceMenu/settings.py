@@ -19,7 +19,6 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'taiman.pythonanywhere.com',
-    '660171b9cdde151415328894--glistening-gumdrop-5f7c14.netlify.app'
 ]
 
 
