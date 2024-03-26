@@ -19,6 +19,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'taiman.pythonanywhere.com',
+    '185.129.51.83'
 ]
 
 
@@ -136,7 +137,8 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://localhost:5173',
     'https://660171b9cdde151415328894--glistening-gumdrop-5f7c14.netlify.app',
-    'https://6601746f8d11cb1395f2f4ca--glistening-gumdrop-5f7c14.netlify.app'
+    'https://6601746f8d11cb1395f2f4ca--glistening-gumdrop-5f7c14.netlify.app',
+    'https://185.129.51.83'
 ]
 
 STATIC_URL = '/static/'
