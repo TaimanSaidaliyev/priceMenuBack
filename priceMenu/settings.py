@@ -19,7 +19,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'taiman.pythonanywhere.com',
-    '185.129.51.83'
+    '185.129.51.83',
+    'ezqr.kz'
 ]
 
 
@@ -149,7 +150,8 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:5173',
     'https://660171b9cdde151415328894--glistening-gumdrop-5f7c14.netlify.app',
     'https://6601746f8d11cb1395f2f4ca--glistening-gumdrop-5f7c14.netlify.app',
-    'https://185.129.51.83'
+    'https://185.129.51.83',
+    'http://ezqr.kz'
 ]
 
 STATIC_URL = '/static/'
