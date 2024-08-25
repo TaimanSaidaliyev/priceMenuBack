@@ -8,7 +8,7 @@ from userProfile.models import Profile
 
 
 def get_establishment_of_user(user_id):
-    user = Profile.objects.get(user=user_id)
+    user = Profile.objects.get(user_id=user_id)
     return user.company.pk
 
 

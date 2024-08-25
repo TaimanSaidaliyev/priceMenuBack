@@ -20,10 +20,9 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'taiman.pythonanywhere.com',
     '185.129.51.83',
-    'ezqr.kz'
+    'ezqr.kz',
+    'doc.ezqr.kz'
 ]
-
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -102,6 +101,13 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

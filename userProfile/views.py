@@ -2,7 +2,6 @@ from django.shortcuts import render
 from rest_framework.views import APIView, Response
 from rest_framework.authtoken.models import Token
 from .models import *
-from rest_framework import status
 
 
 class TokenCheck(APIView):
@@ -20,7 +19,7 @@ class GetEstablishmentByToken(APIView):
         try:
             token_value = request.data['token']
             res = Token.objects.get(key=token_value).user.pk
-            establishment_id = Profile.objects.get(pk=res).company.pk
+            establishment_id = Profile.objects.get(user_id=res).company.pk
             return Response({'establishment_id': establishment_id})
         except:
             return Response({'establishment_id': 'null'})
