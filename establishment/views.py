@@ -5,6 +5,9 @@ from .serializers import *
 from rest_framework import status, permissions
 from django.contrib.auth.models import User
 from userProfile.models import Profile
+from django.utils import timezone
+from rest_framework.pagination import PageNumberPagination
+from ipware import get_client_ip
 
 
 def get_establishment_of_user(user_id):
@@ -87,7 +90,7 @@ class ListOfProducts(APIView):
 
 class GetPromotionsByEstablishment(APIView):
     def get(self, request, establishment_id):
-        list = Promotions.objects.filter(establishment=establishment_id)
+        list = Promotions.objects.filter(establishment=establishment_id, until_date__gte=timezone.now())
         return Response(
             {
                 'promotions': PromotionsByEstablishmentSerializer(list, many=True).data
@@ -117,7 +120,7 @@ class GetCategoryListByMenuId(APIView):
 
 class GetProductListByCategoryId(APIView):
     def get(self, request, category_id):
-        list = Products.objects.filter(category_id=category_id)
+        list = Products.objects.filter(category_id=category_id, parent=None)
         return Response(
             {
                 'products': ProductListByCategoryId(list, many=True).data
@@ -132,6 +135,14 @@ class GetProductById(APIView):
             {
                 'product': ProductListByCategoryId(list, many=False).data
             }
+        )
+
+
+class GetTagsList(APIView):
+    def get(self, request):
+        list = ProductTag.objects.all()
+        return Response(
+            ProductTagSerializer(list, many=True).data
         )
 
 
@@ -248,13 +259,14 @@ class AddProductByCategory(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
+        print(request.data)
         if is_access(request):
             try:
                 product_instance = Products.objects.get(pk=pk)
             except Products.DoesNotExist:
                 return Response({"error": "Product does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-            serializer = ProductAddSerializer(product_instance, data=request.data, partial=True)
+            serializer = ProductPutSerializer(product_instance, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -270,9 +282,6 @@ class AddProductByCategory(APIView):
                     'product': ProductAddSerializer(list, many=False).data
                 }
             )
-        # else:
-        #     return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
     def delete(self, request, pk):
         if is_access_product_pk(request, pk):
@@ -339,3 +348,26 @@ class GetProductsByIds(APIView):
                 pass
         serializer = ProductWithCountSerializer(products_with_count, many=True)
         return Response(serializer.data)
+
+
+class ReviewPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class EstablishmentReviewListCreateAPIView(generics.ListCreateAPIView):
+
+    serializer_class = EstablishmentReviewSerializer
+    pagination_class = ReviewPagination
+
+    def get_queryset(self):
+        qs = EstablishmentReviews.objects.all().order_by('created_at')
+        est_id = self.request.query_params.get('establishment')
+        if est_id:
+            qs = qs.filter(establishment_id=est_id)
+        return qs
+
+    def perform_create(self, serializer):
+        client_ip, is_routable = get_client_ip(self.request)
+        serializer.save(ip_address=client_ip or '')

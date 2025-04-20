@@ -14,6 +14,7 @@ urlpatterns = [
     path('dict/<int:menu_id>/category/', GetCategoryListByMenuId.as_view()),
     path('dict/<int:category_id>/products/', GetProductListByCategoryId.as_view()),
     path('dict/<int:product_id>/product/information/', GetProductById.as_view()),
+    path('dict/tags_list/', GetTagsList.as_view()),
     path('add_edit/menu/establishment/<int:pk>/', AddMenuByEstablishment.as_view()),
     path('add_edit/menu/establishment/', AddMenuByEstablishment.as_view()),
     path('add_edit/category/<int:pk>/', AddCategoryByMenu.as_view()),

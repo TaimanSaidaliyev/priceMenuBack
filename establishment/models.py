@@ -66,10 +66,20 @@ class TypeOfEstablishment(models.Model):
 class Establishment(models.Model):
     SQUARE = 'Square'
     LIST = 'List'
+    NO_IMAGE = 'NoImage'
+
     MENU_VIEW_CHOICES = [
         (SQUARE, 'Квадратные плиты'),
         (LIST, 'Списком'),
+        (NO_IMAGE, 'Без изображений'),
     ]
+
+    TAGS_VIEW_CHOICES = [
+        ('FIRST', 'Стандартные'),
+        ('SECOND', 'Упрощенный'),
+        ('THIRD', 'Одним стилем'),
+    ]
+
     title = models.CharField(max_length=99, verbose_name='Название заведения')
     default_color = models.CharField(max_length=7, verbose_name='Цвет заведения')
     secondary_color = models.BooleanField(default=True, verbose_name='Вторичный цвет (Белый)')
@@ -90,6 +100,7 @@ class Establishment(models.Model):
     type_of_establishment = models.ForeignKey(TypeOfEstablishment, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Тип заведения', related_name='get_type_of_establishment')
     menu_view_type = models.CharField(max_length=10, choices=MENU_VIEW_CHOICES, default=LIST, verbose_name='Вид меню')
     until_date = models.DateField(blank=True, verbose_name='Дата истечения срока', default=date(2024, 1, 1))
+    tags_type_view = models.CharField(max_length=10, choices=TAGS_VIEW_CHOICES, default='FIRST', verbose_name='Вид тэгов')
 
     def __str__(self):
         return self.title
@@ -139,9 +150,36 @@ class MenuCategory(models.Model):
         order_insertion_by = ['created_at']
 
 
+class ProductTag(models.Model):
+    COLOR_CHOICES = [
+        ('blue', 'blue'),
+        ('gray', 'gray'),
+        ('red', 'red'),
+        ('green', 'green'),
+        ('yellow', 'yellow'),
+        ('indigo', 'indigo'),
+        ('purple', 'purple'),
+        ('pink', 'pink'),
+    ]
+    title = models.CharField(max_length=100, db_index=True, verbose_name='Тег')
+    color = models.CharField(max_length=10, choices=COLOR_CHOICES, default='blue', verbose_name='Цвет тега')
+    icon = models.CharField(max_length=100, db_index=True, blank=True, null=True, verbose_name='Иконка')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Теги'
+        verbose_name_plural = 'Теги'
+        ordering = ['created_at']
+
+
 class Products (models.Model):
     title = models.CharField(max_length=99, verbose_name='Название блюда')
     description = models.TextField(max_length=500, verbose_name='Описание блюда', blank=True)
+    parent = models.ForeignKey('self', on_delete=models.PROTECT, verbose_name='Родительский товар', blank=True, null=True, default=None, related_name='product_parent')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
     price = models.FloatField(default=0, blank=False, null=False, verbose_name='Текущая цена')
@@ -154,8 +192,12 @@ class Products (models.Model):
                                       verbose_name='Заведение', related_name='get_products_establishment')
     sorting_number = models.IntegerField(default=0, blank=True, null=True, verbose_name='Порядок сортировки')
     additional_code = models.CharField(max_length=99, verbose_name='Альтернативный код', blank=True, default='')
+    is_recommended = models.BooleanField(default=False, blank=True, null=True, verbose_name='Рекомендовано')
+    tags = models.ManyToManyField(ProductTag, blank=True, null=True, verbose_name='Теги')
 
     def __str__(self):
+        if self.establishment:
+            return f"{self.establishment} - {self.title}"
         return self.title
 
     class Meta:
@@ -180,7 +222,7 @@ class Promotions(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
     promotion_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default=BANNER, verbose_name='Тип акции')
     establishment = models.ForeignKey(Establishment, on_delete=models.PROTECT, blank=True, null=True,
-                                      verbose_name='Заведение', related_name='get_promotions_establishment')
+                                      verbose_name='Заведение', related_name='get_review_establishment')
 
     def __str__(self):
         return self.title
@@ -188,4 +230,24 @@ class Promotions(models.Model):
     class Meta:
         verbose_name = 'Акции'
         verbose_name_plural = 'Акции'
+        ordering = ['created_at']
+
+
+class EstablishmentReviews(models.Model):
+    ip_address = models.CharField(max_length=99, verbose_name='IP адрес')
+    description = models.TextField(max_length=300, db_index=True, verbose_name='Описание акции', blank=True, default='')
+    coordinate_w = models.FloatField(default=0, blank=False, null=False, verbose_name='Ширина')
+    coordinate_h = models.FloatField(default=0, blank=False, null=False, verbose_name='Долгота')
+    photo = models.ImageField(upload_to='photos/%Y/%m/%d', verbose_name='Изображение', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
+    establishment = models.ForeignKey(Establishment, on_delete=models.PROTECT, blank=True, null=True,
+                                      verbose_name='Заведение', related_name='get_promotions_establishment')
+
+    def __str__(self):
+        return self.establishment.title + ' ' + self.description
+
+    class Meta:
+        verbose_name = 'Отзывы заведений'
+        verbose_name_plural = 'Отзывы заведений'
         ordering = ['created_at']
